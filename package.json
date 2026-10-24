@@ -1,0 +1,12 @@
+{
+  "name": "agent-team-calculator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A calculator web app built by an agent squad",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
