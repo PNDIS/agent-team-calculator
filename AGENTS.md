@@ -10,5 +10,7 @@
   (e.g. `fac-140-calculator`). The PR title starts with the ticket id (`FAC-140: …`), and the
   description lists the acceptance criteria with how each one is covered.
 - **Tests are required.** Every acceptance criterion has at least one test. CI (`.github/workflows/ci.yml`)
-  must be green before QA approves.
+  must be green before QA approves. CI reports its result as the commit status `ci/tests` on the
+  PR's head commit (read it with `pull_request_read` method `get_status`): `success` is green;
+  `pending` or no status means it hasn't finished; `failure` means it failed.
 - **Merging.** Squash-merge after QA approves. Merging to `main` deploys the app to GitHub Pages.
