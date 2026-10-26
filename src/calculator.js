@@ -56,13 +56,18 @@ function initialState() {
 }
 
 /**
- * Handle a digit character ('0'–'9') or decimal point ('.').
+ * Handle a digit character ('0'-'9') or decimal point ('.').
  */
 function inputDigit(state, digit) {
-  if (state.error || state.waitingForOperand) {
-    // start fresh unless error (error clears on digit too)
+  // Error: clear everything and start with this digit
+  if (state.error) {
     return { ...initialState(), display: digit === '.' ? '0.' : digit, waitingForOperand: false };
   }
+  // Just pressed an operator: start a new operand but keep pending/operator
+  if (state.waitingForOperand) {
+    return { ...state, display: digit === '.' ? '0.' : digit, waitingForOperand: false };
+  }
+  // Normal digit append
   if (digit === '.') {
     if (state.display.includes('.')) return state; // already has decimal
     return { ...state, display: state.display + '.' };
