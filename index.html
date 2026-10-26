@@ -4,11 +4,128 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a1a2e;
+      font-family: system-ui, sans-serif;
+    }
+
+    .calc {
+      width: min(360px, 95vw);
+      background: #16213e;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    }
+
+    .display {
+      background: #0f3460;
+      color: #e0e0e0;
+      font-size: clamp(1.5rem, 6vw, 2.25rem);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      padding: .75rem 1rem;
+      min-height: 4rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: #0a0a1a;
+    }
+
+    button {
+      font-size: clamp(1rem, 4vw, 1.5rem);
+      padding: .85em .5em;
+      border: none;
+      cursor: pointer;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      transition: background .1s;
+    }
+    button:hover  { background: #2a2a4e; }
+    button:active { background: #3a3a6e; }
+
+    .btn-op   { background: #533483; color: #fff; }
+    .btn-op:hover  { background: #6344a3; }
+    .btn-op:active { background: #7354b3; }
+
+    .btn-eq   { background: #e94560; color: #fff; }
+    .btn-eq:hover  { background: #f95570; }
+    .btn-eq:active { background: #ff6580; }
+
+    .btn-clear { background: #533483; color: #ffd; }
+    .btn-clear:hover  { background: #6344a3; }
+    .btn-clear:active { background: #7354b3; }
+
+    .btn-zero  { grid-column: span 2; }
+  </style>
 </head>
 <body>
-  <main>
-    <h1>Calculator</h1>
-    <p>Coming soon: the agent squad is building it.</p>
-  </main>
+  <div class="calc">
+    <div id="display" class="display" role="status" aria-live="polite" aria-atomic="true">0</div>
+    <div class="buttons">
+      <button class="btn-clear" onclick="handleClear()">C</button>
+      <button class="btn-op"    onclick="handleOperator('/')">÷</button>
+      <button class="btn-op"    onclick="handleOperator('*')">×</button>
+      <button class="btn-op"    onclick="handleOperator('-')">−</button>
+
+      <button onclick="handleDigit('7')">7</button>
+      <button onclick="handleDigit('8')">8</button>
+      <button onclick="handleDigit('9')">9</button>
+      <button class="btn-op" style="grid-row: span 2" onclick="handleOperator('+')" aria-label="plus">+</button>
+
+      <button onclick="handleDigit('4')">4</button>
+      <button onclick="handleDigit('5')">5</button>
+      <button onclick="handleDigit('6')">6</button>
+
+      <button onclick="handleDigit('1')">1</button>
+      <button onclick="handleDigit('2')">2</button>
+      <button onclick="handleDigit('3')">3</button>
+      <button class="btn-eq" style="grid-row: span 2" onclick="handleEquals()" aria-label="equals">=</button>
+
+      <button class="btn-zero" onclick="handleDigit('0')">0</button>
+      <button onclick="handleDigit('.')">.</button>
+    </div>
+  </div>
+
+  <script src="src/calculator.js"></script>
+  <script>
+    const disp = document.getElementById('display');
+
+    function updateDisplay() {
+      disp.textContent = getDisplay();
+    }
+
+    function handleDigit(ch) {
+      pressDigit(ch);
+      updateDisplay();
+    }
+
+    function handleOperator(op) {
+      pressOperator(op);
+      updateDisplay();
+    }
+
+    function handleEquals() {
+      pressEquals();
+      updateDisplay();
+    }
+
+    function handleClear() {
+      pressClear();
+      updateDisplay();
+    }
+  </script>
 </body>
 </html>
