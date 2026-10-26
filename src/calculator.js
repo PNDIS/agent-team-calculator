@@ -1,11 +1,12 @@
 'use strict';
 
 // ── state ──────────────────────────────────────────────────────────────────
-let displayValue = '0';   // what the display shows
-let storedValue  = null;  // left-hand operand
-let pendingOp    = null;  // pending operator string
-let justEvalled  = false; // true right after pressing =
-let isError      = false; // true while showing Error
+let displayValue     = '0';   // what the display shows
+let storedValue      = null;  // left-hand operand
+let pendingOp        = null;  // pending operator string
+let justEvalled      = false; // true right after pressing =
+let isError          = false; // true while showing Error
+let startingNewInput = true;  // true when next digit should start a fresh number
 
 // ── helpers ────────────────────────────────────────────────────────────────
 /**
@@ -41,18 +42,26 @@ function applyOp(op, a, b) {
 function getDisplay() { return displayValue; }
 
 /**
- * Handle a digit (0-9) or decimal point press.
+ * Handle a digit (0–9) or decimal point press.
  * @param {string} ch  '0'–'9' or '.'
  */
 function pressDigit(ch) {
   if (isError) return;
-  if (justEvalled) {
-    // After =, start fresh unless the next thing is a digit (new number)
-    displayValue = '0';
-    storedValue  = null;
-    pendingOp    = null;
-    justEvalled  = false;
+
+  // After = or after pressing an operator, the next digit starts a brand-new number
+  if (justEvalled || startingNewInput) {
+    displayValue     = '0';
+    justEvalled      = false;
+    startingNewInput = false;
+    // When coming from =, also clear the stored chain so pressing a digit
+    // after = truly starts fresh (AC5: pressing an operator after = is
+    // handled in pressOperator, not here)
+    if (justEvalled) {
+      storedValue = null;
+      pendingOp   = null;
+    }
   }
+
   if (ch === '.') {
     if (!displayValue.includes('.')) displayValue += '.';
     return;
@@ -71,14 +80,15 @@ function pressDigit(ch) {
 function pressOperator(op) {
   if (isError) return;
   const current = parseFloat(displayValue);
-  if (pendingOp !== null && !justEvalled) {
-    // Chain: compute the pending operation first
+  if (pendingOp !== null && !justEvalled && !startingNewInput) {
+    // Chain: compute the pending operation first (left-to-right, no precedence)
     const result = applyOp(pendingOp, storedValue, current);
     if (!isFinite(result)) {
-      displayValue = 'Error';
-      isError = true;
-      pendingOp = null;
-      storedValue = null;
+      displayValue     = 'Error';
+      isError          = true;
+      pendingOp        = null;
+      storedValue      = null;
+      startingNewInput = false;
       return;
     }
     storedValue  = result;
@@ -86,8 +96,9 @@ function pressOperator(op) {
   } else {
     storedValue = current;
   }
-  pendingOp   = op;
-  justEvalled = false;
+  pendingOp        = op;
+  justEvalled      = false;
+  startingNewInput = true;  // next digit starts the right-hand operand
 }
 
 /**
@@ -99,27 +110,30 @@ function pressEquals() {
   const current = parseFloat(displayValue);
   const result  = applyOp(pendingOp, storedValue, current);
   if (!isFinite(result)) {
-    displayValue = 'Error';
-    isError = true;
-    pendingOp = null;
-    storedValue = null;
+    displayValue     = 'Error';
+    isError          = true;
+    pendingOp        = null;
+    storedValue      = null;
+    startingNewInput = false;
     return;
   }
-  displayValue = formatResult(result);
-  storedValue  = null;
-  pendingOp    = null;
-  justEvalled  = true;
+  displayValue     = formatResult(result);
+  storedValue      = parseFloat(displayValue); // keep result for AC5 chain
+  pendingOp        = null;
+  justEvalled      = true;
+  startingNewInput = false;
 }
 
 /**
  * Handle the C (clear) button.
  */
 function pressClear() {
-  displayValue = '0';
-  storedValue  = null;
-  pendingOp    = null;
-  justEvalled  = false;
-  isError      = false;
+  displayValue     = '0';
+  storedValue      = null;
+  pendingOp        = null;
+  justEvalled      = false;
+  isError          = false;
+  startingNewInput = true;
 }
 
 // ── module export (for node --test) ────────────────────────────────────────
