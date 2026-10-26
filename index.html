@@ -4,11 +4,160 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a1a2e;
+      font-family: system-ui, sans-serif;
+      padding: 16px;
+    }
+
+    .calc {
+      background: #16213e;
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 320px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    .display {
+      background: #0f3460;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: right;
+      margin-bottom: 16px;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .display-text {
+      color: #e2e2e2;
+      font-size: clamp(1.2rem, 5vw, 2rem);
+      font-weight: 300;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+      max-width: 100%;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      min-height: 56px;
+      min-width: 56px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.25rem;
+      font-weight: 500;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: opacity 0.1s;
+    }
+
+    button:active { opacity: 0.7; }
+
+    .btn-digit  { background: #1a1a2e; color: #e2e2e2; }
+    .btn-op     { background: #533483; color: #fff; }
+    .btn-clear  { background: #e94560; color: #fff; }
+    .btn-equals { background: #0f3460; color: #fff; grid-column: span 2; }
+
+    .btn-zero { grid-column: span 2; }
+  </style>
 </head>
 <body>
-  <main>
-    <h1>Calculator</h1>
-    <p>Coming soon: the agent squad is building it.</p>
-  </main>
+  <div class="calc">
+    <div class="display">
+      <span class="display-text" id="display" aria-live="polite" aria-label="calculator display">0</span>
+    </div>
+    <div class="buttons">
+      <button class="btn-clear" data-action="clear" aria-label="Clear">C</button>
+      <button class="btn-op"    data-action="noop" aria-label="plus-minus" style="visibility:hidden"></button>
+      <button class="btn-op"    data-action="noop" aria-label="percent"    style="visibility:hidden"></button>
+      <button class="btn-op"    data-operator="/"  aria-label="divide">÷</button>
+
+      <button class="btn-digit" data-digit="7">7</button>
+      <button class="btn-digit" data-digit="8">8</button>
+      <button class="btn-digit" data-digit="9">9</button>
+      <button class="btn-op"    data-operator="*"  aria-label="multiply">×</button>
+
+      <button class="btn-digit" data-digit="4">4</button>
+      <button class="btn-digit" data-digit="5">5</button>
+      <button class="btn-digit" data-digit="6">6</button>
+      <button class="btn-op"    data-operator="-"  aria-label="subtract">−</button>
+
+      <button class="btn-digit" data-digit="1">1</button>
+      <button class="btn-digit" data-digit="2">2</button>
+      <button class="btn-digit" data-digit="3">3</button>
+      <button class="btn-op"    data-operator="+"  aria-label="add">+</button>
+
+      <button class="btn-digit btn-zero" data-digit="0">0</button>
+      <button class="btn-digit" data-decimal=".">.</button>
+      <button class="btn-equals" data-action="equals" aria-label="equals">=</button>
+    </div>
+  </div>
+
+  <script src="src/calculator.js"></script>
+  <script>
+    const displayEl = document.getElementById('display');
+
+    function updateDisplay() {
+      displayEl.textContent = getDisplay();
+    }
+
+    // Button clicks
+    document.querySelector('.buttons').addEventListener('click', function(e) {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      if (btn.dataset.digit !== undefined) {
+        inputDigit(btn.dataset.digit);
+      } else if (btn.dataset.decimal !== undefined) {
+        inputDecimal();
+      } else if (btn.dataset.operator) {
+        handleOperator(btn.dataset.operator);
+      } else if (btn.dataset.action === 'clear') {
+        handleClear();
+      } else if (btn.dataset.action === 'equals') {
+        handleEquals();
+      }
+      updateDisplay();
+    });
+
+    // Keyboard support (AC10)
+    document.addEventListener('keydown', function(e) {
+      if (e.key >= '0' && e.key <= '9') {
+        inputDigit(e.key);
+      } else if (e.key === '.') {
+        inputDecimal();
+      } else if (e.key === '+') {
+        handleOperator('+');
+      } else if (e.key === '-') {
+        handleOperator('-');
+      } else if (e.key === '*') {
+        handleOperator('*');
+      } else if (e.key === '/') {
+        e.preventDefault(); // prevent browser quick-find
+        handleOperator('/');
+      } else if (e.key === 'Enter') {
+        handleEquals();
+      } else if (e.key === 'Escape') {
+        handleClear();
+      } else {
+        return;
+      }
+      updateDisplay();
+    });
+  </script>
 </body>
 </html>
