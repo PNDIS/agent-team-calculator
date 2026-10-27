@@ -4,96 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calculator</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #1c1c1e;
-      font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
-    }
-    .calculator {
-      width: 100%;
-      max-width: 320px;
-      padding: 16px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-    #display {
-      grid-column: 1 / -1;
-      background: #000;
-      color: #fff;
-      font-size: 2.5rem;
-      text-align: right;
-      padding: 20px 16px;
-      border-radius: 12px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      min-height: 4.5rem;
-    }
-    button {
-      font-size: 1.4rem;
-      padding: 18px 0;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      background: #333;
-      color: #fff;
-    }
-    button:active { filter: brightness(1.4); }
-    button.op { background: #ff9f0a; }
-    button.util { background: #a5a5a5; color: #000; }
-    button.zero { grid-column: span 2; border-radius: 40px; }
-    @media (max-width: 375px) {
-      .calculator { max-width: 100%; gap: 8px; padding: 8px; }
-      button { padding: 16px 0; }
-    }
-  </style>
 </head>
 <body>
-  <main class="calculator" aria-label="Calculator">
-    <div id="display" role="status" aria-live="polite">0</div>
-    <button class="util" data-action="clear">C</button>
-    <button class="op" data-op="/" aria-label="divide">÷</button>
-    <button class="op" data-op="*" aria-label="multiply">×</button>
-    <button class="op" data-op="-" aria-label="subtract">−</button>
-    <button data-digit="7">7</button>
-    <button data-digit="8">8</button>
-    <button data-digit="9">9</button>
-    <button class="op" data-op="+" aria-label="add">+</button>
-    <button data-digit="4">4</button>
-    <button data-digit="5">5</button>
-    <button data-digit="6">6</button>
-    <button class="op" data-action="equals" aria-label="equals">=</button>
-    <button data-digit="1">1</button>
-    <button data-digit="2">2</button>
-    <button data-digit="3">3</button>
-    <button data-action="dot">.</button>
-    <button class="zero" data-digit="0">0</button>
+  <main>
+    <h1>Calculator</h1>
+    <p>Coming soon: the agent squad is building it.</p>
   </main>
-  <script src="src/calculator.js"></script>
-  <script>
-    (function () {
-      var state = initialState();
-      var display = document.getElementById('display');
-      function render() { display.textContent = state.display; }
-      document.querySelector('.calculator').addEventListener('click', function (ev) {
-        var el = ev.target.closest('button');
-        if (!el) return;
-        if (el.dataset.digit !== undefined) state = pressDigit(state, el.dataset.digit);
-        else if (el.dataset.op) state = pressOperator(state, el.dataset.op);
-        else if (el.dataset.action === 'equals') state = pressEquals(state);
-        else if (el.dataset.action === 'clear') state = pressClear();
-        else if (el.dataset.action === 'dot') state = pressDot(state);
-        render();
-      });
-      render();
-    })();
-  </script>
 </body>
 </html>
